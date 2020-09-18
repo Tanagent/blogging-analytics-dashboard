@@ -8,6 +8,7 @@ headers = {
     'referrer': 'https://google.com'
 }
 
+# Scraping One Page
 def parse_page(url):
     r = requests.get(url, headers = headers)
     html = r.text.strip()
@@ -89,3 +90,47 @@ url = 'https://blog.frame.io/2020/02/03/color-spaces-101/'
 wmn_exp = parse_page(url)
 
 print(wmn_exp)
+
+# Scraping One Category
+articles_store = []
+
+def parse_category(url):
+    r = requests.get(url, headers = headers)
+    html = r.text.strip()
+    soup = BeautifulSoup(html, 'lxml')
+
+    article_cards = soup.findAll(class_ = 'post-content')
+
+    for article in article_cards:
+        title = article.find(class_ = 'post-meta-title')
+        link = title.contents[0]['href']
+        print('Parsing URL: ', link)
+        page = parse_page(link)
+        articles_store.append(page)
+    
+    next_link = find_next_link(soup)
+
+    if next_link is not None:
+        print('Next page: ', next_link)
+        parse_category(next_link)
+    
+    return None
+
+
+def find_next_link(soup_item):
+    bottom_nav = soup_item.find(class_ = 'navigation')
+
+    if bottom_nav == None:
+        return None
+    
+    links = bottom_nav.findAll('a')
+    next_page = links[-1]
+
+    if next_page.contents[0] == 'Next':
+        next_link = next_page['href']
+        return next_link
+    
+    return None
+
+bts = 'https://blog.frame.io/category/behind-the-scenes/'
+parse_category(bts)
