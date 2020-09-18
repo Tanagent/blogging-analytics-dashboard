@@ -89,11 +89,7 @@ def extract_categories(header):
 url = 'https://blog.frame.io/2020/02/03/color-spaces-101/'
 wmn_exp = parse_page(url)
 
-print(wmn_exp)
-
 # Scraping One Category
-articles_store = []
-
 def parse_category(url):
     r = requests.get(url, headers = headers)
     html = r.text.strip()
@@ -132,5 +128,16 @@ def find_next_link(soup_item):
     
     return None
 
-bts = 'https://blog.frame.io/category/behind-the-scenes/'
-parse_category(bts)
+# Scrapping All Categories
+articles_store = []
+categories = ['post-production', 'color-correction', 'business', 'workflow', 'behind-the-scenes', 'production', 'announcement']
+
+for category in categories:
+    url = 'https://blog.frame.io/category/' + category + '/'
+    print('Parsing category', category)
+    parse_category(url)
+
+import json
+
+with open('data/articles.json', 'w') as f:
+    json.dump(articles_store, f)
