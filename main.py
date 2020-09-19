@@ -130,10 +130,23 @@ def find_next_link(soup_item):
 
 # Scrapping All Categories
 articles_store = []
-categories = ['post-production', 'color-correction', 'business', 'workflow', 'behind-the-scenes', 'production', 'announcement']
+categories = []
+
+r = requests.get('https://blog.frame.io/', headers = headers)
+html = r.text.strip()
+soup = BeautifulSoup(html, 'lxml')
+
+category_list = soup.find(class_ = 'navbar-nav top-drop-menu')
+
+atag = category_list.findAll('a')
+
+categories = []
+for item in atag:
+    if(len(item['href'].split('/')) == 6):
+        categories.append(item['href'])
 
 for category in categories:
-    url = 'https://blog.frame.io/category/' + category + '/'
+    url = category
     print('Parsing category', category)
     parse_category(url)
 
